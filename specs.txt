@@ -1,0 +1,22 @@
+overview:
+  8-bit opcodes
+  8 8-bit general data registers (0-7)
+  4 16-bit registers
+  1 16-bit PC register
+  1 16-bit stack register
+  1 16-bit return address register
+
+
+instruction overview:
+
+  
+
+  8-bit general data register instructions:
+
+    instructions on general 8-bit data registers are of the format:
+      XXXXXRRR, where XXXXX is the instruction, and RRR is the destination register
+    
+    these include:
+      opcode:   desc.:                args:           result:
+      00000RRR  set zero              None            RRR <- 0
+      00001RRR  immidiate add         D (8-bits)      RRR <- RRR + D
