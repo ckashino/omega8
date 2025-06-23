@@ -1,11 +1,17 @@
 overview:
   8-bit opcodes
-  8 8-bit general data registers (0-7)
-  4 16-bit registers
+  8 8-bit general data registers (A-H or 0-7)
+    can be used as 16-bit registers (4 total)
+    AB or 01
+    CD or 23
+    EF or 45
+    GH or 67
+  1 arbitrary zero register
   1 16-bit PC register
   1 16-bit stack register
   1 16-bit return address register
 
+  multi-cycle single-stage
 
 instruction overview:
 
@@ -13,10 +19,16 @@ instruction overview:
 
   8-bit general data register instructions:
 
-    instructions on general 8-bit data registers are of the format:
+    instructions are of the format:
       XXXXXRRR, where XXXXX is the instruction, and RRR is the destination register
     
     these include:
       opcode:   desc.:                args:           result:
-      00000RRR  set zero              None            RRR <- 0
-      00001RRR  immidiate add         D (8-bits)      RRR <- RRR + D
+      00000RRR  immidiate add         R1, D1          RRR <- R1 + D
+      00001RRR  add                   R1, R2          RRR <- R1 + R2
+      00010RRR  and                   R1, R2          RRR <- R1 & R2
+      00011RRR  or                    R1, R2          RRR <- R1 | R2
+      00100RRR  set (16)              D1, D2          RRR <- [D1, D2]
+      00101RRR  add (16)              R1, R2          RRR <- R1 + R2
+      00110RRR  and (16)              R1, R2          RRR <- R1 & R2
+      00111RRR  or (16)               R1, R2          RRR <- R1 | R2
