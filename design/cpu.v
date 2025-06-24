@@ -2,15 +2,10 @@ module cpu (
   input i_clk, i_instr_ready, i_mem_ready, i_hold, i_rst,
   input [7:0] i_opcode,
   input [7:0] i_data1, i_data2, 
-  input [3:0] i_address,
+  input [2:0] i_address,
   output o_wait,
   output [7:0] o_data
   );
-
-  reg [7:0] reg_8b [0:7];
-  reg [15:0] reg_sp;
-  reg [15:0] reg_pc;
-  reg [15:0] reg_ra;
 
   reg [7:0] opcode;
   reg [7:0] data1;
@@ -18,6 +13,9 @@ module cpu (
 
   reg state;
   reg nextstate;
+  
+  wire register_read;
+  wire register_write;
 
   // multi-cycle single stage
 
