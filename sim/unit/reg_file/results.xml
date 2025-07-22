@@ -1,0 +1,10 @@
+<testsuites name="results">
+  <testsuite name="all" package="all">
+    <property name="random_seed" value="1753219803" />
+    <testcase name="test_read" classname="verify" file="/home/ckashino/programming/verilog/8bit/sim/unit/reg_file/verify.py" lineno="6" time="0.0008962154388427734" sim_time_ns="0.011" ratio_time="12.273834530460228" />
+    <testcase name="test_write" classname="verify" file="/home/ckashino/programming/verilog/8bit/sim/unit/reg_file/verify.py" lineno="29" time="0.00017380714416503906" sim_time_ns="0.011" ratio_time="63.28853772290809" />
+    <testcase name="test_write_read" classname="verify" file="/home/ckashino/programming/verilog/8bit/sim/unit/reg_file/verify.py" lineno="49" time="3.7670135498046875e-05" sim_time_ns="0.0010000000000000009" ratio_time="26.54622784810129">
+      <failure message="Test failed with RANDOM_SEED=1753219803" />
+    </testcase>
+  </testsuite>
+</testsuites>

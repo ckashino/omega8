@@ -1,0 +1,11 @@
+<testsuites name="results">
+  <testsuite name="all" package="all">
+    <property name="random_seed" value="1753219470" />
+    <testcase name="test_add" classname="unit.alu.verify" file="/home/ckashino/programming/verilog/8bit/sim/unit/alu/verify.py" lineno="12" time="0.0004291534423828125" sim_time_ns="0.011" ratio_time="25.631857777777775" />
+    <testcase name="test_add_carry_out" classname="unit.alu.verify" file="/home/ckashino/programming/verilog/8bit/sim/unit/alu/verify.py" lineno="25" time="0.00018858909606933594" sim_time_ns="0.011" ratio_time="58.32786852085967" />
+    <testcase name="test_add_carry_in" classname="unit.alu.verify" file="/home/ckashino/programming/verilog/8bit/sim/unit/alu/verify.py" lineno="40" time="0.00011086463928222656" sim_time_ns="0.011000000000000003" ratio_time="99.22009462365594" />
+    <testcase name="test_sub" classname="unit.alu.verify" file="/home/ckashino/programming/verilog/8bit/sim/unit/alu/verify.py" lineno="55" time="0.00013208389282226562" sim_time_ns="0.010999999999999996" ratio_time="83.28040433212993" />
+    <testcase name="test_sub_neg_arg" classname="unit.alu.verify" file="/home/ckashino/programming/verilog/8bit/sim/unit/alu/verify.py" lineno="69" time="0.00011038780212402344" sim_time_ns="0.011000000000000003" ratio_time="99.64869114470845" />
+    <testcase name="test_sub_neg_result" classname="unit.alu.verify" file="/home/ckashino/programming/verilog/8bit/sim/unit/alu/verify.py" lineno="85" time="0.00010061264038085938" sim_time_ns="0.011000000000000003" ratio_time="109.33019905213273" />
+  </testsuite>
+</testsuites>

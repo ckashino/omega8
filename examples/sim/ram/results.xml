@@ -1,0 +1,8 @@
+<testsuites name="results">
+  <testsuite name="all" package="all">
+    <property name="random_seed" value="1753214600" />
+    <testcase name="test_write_read" classname="verify" file="/home/ckashino/programming/verilog/8bit/sim/unit/ram/verify.py" lineno="1" time="0.0009946823120117188" sim_time_ns="0.011" ratio_time="11.058807286673058">
+      <failure message="Test failed with RANDOM_SEED=1753214600" />
+    </testcase>
+  </testsuite>
+</testsuites>
