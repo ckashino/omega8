@@ -1,8 +1,0 @@
-<testsuites name="results">
-  <testsuite name="all" package="all">
-    <property name="random_seed" value="1752084616" />
-    <testcase name="test_read" classname="verify" file="/home/ckashino/programming/verilog/8bit/sim/unit/reg_file/verify.py" lineno="6" time="0.0008244514465332031" sim_time_ns="0.011" ratio_time="13.342204742625794" />
-    <testcase name="test_write" classname="verify" file="/home/ckashino/programming/verilog/8bit/sim/unit/reg_file/verify.py" lineno="32" time="0.00019621849060058594" sim_time_ns="0.011" ratio_time="56.059956257594166" />
-    <testcase name="test_write_read" classname="verify" file="/home/ckashino/programming/verilog/8bit/sim/unit/reg_file/verify.py" lineno="59" time="0.00019407272338867188" sim_time_ns="0.020999999999999998" ratio_time="108.20685995085994" />
-  </testsuite>
-</testsuites>
