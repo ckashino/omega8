@@ -1,36 +1,35 @@
-// dual read reg file
+// dual read, single write reg file
 module reg_file (
-  input [2:0] i_address1, i_address2,
+  input [2:0] i_r_address1, i_r_address2, i_w_address,
   input [7:0] i_data,
-  input i_read, i_write, i_clk,
-  output o_done,
-  output [7:0] o_data1, o_data2
+  input i_read, i_write,
+  input i_clk, i_rst,
+  output reg [7:0] o_data1, o_data2
   );
 
   reg [7:0] registers [0:7];
-  reg [15:0] register_sp;
-  reg [15:0] register_pc;
-  reg [15:0] register_ra;
 
-  always @(posedge clk) begin
-    o_done <= 0;
-
-
-    if (i_read) begin
-      if (i_address1 != 0)
-        o_data1 <= registers[i_address1];
-      else
-        o_data1 <= 8'd0;
-      if (i_address2 != 0)
-        o_data1 <= registers[i_address2];
-      else
-        o_data2 <= 8'd0;
-
-      o_done <= 1;
-
-    end else if (i_write) begin
-      if (i_address1 != 0)
-        registers[i_address1] <= i_data;
-      o_done <= 1;
+  integer i;
+  initial begin
+    for (i=0;i<8;i=i+1) begin
+      registers[i] = 0;
     end
   end
+
+  always @(posedge i_clk or posedge i_rst) begin
+    if (i_rst) begin
+      i = 0;
+      for (i=0;i<8;i=i+1) begin
+        registers[i] = 0;
+      end
+    end
+    if (i_read) begin
+        o_data1 <= registers[i_r_address1];
+        o_data2 <= registers[i_r_address2];
+    end
+    if (i_write) begin
+      registers[i_w_address] <= i_data;
+    end
+  end
+
+endmodule

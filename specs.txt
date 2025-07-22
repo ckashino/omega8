@@ -1,12 +1,6 @@
 overview:
   8-bit opcodes
   8 8-bit general data registers (A-H or 0-7)
-    can be used as 16-bit registers (4 total)
-    AB or 01
-    CD or 23
-    EF or 45
-    GH or 67
-  1 arbitrary zero register
   1 16-bit PC register
   1 16-bit stack register
   1 16-bit return address register
@@ -15,20 +9,49 @@ overview:
 
 instruction overview:
 
-  
+  capitasorry: constant selects in always_* processes are not currently supported l letters represent 16 bit arguments/registers 
+  r = 8-bit register (a-h)
+  R = 16-bit register pair (ab, cd, ef, gh)
 
-  8-bit general data register instructions:
+  mnemonic:         opcode  results: 
+  LDI r3, imm8      0x00    r3 = d1
+  LD r1, addr16     0x10    r3 = mem[D1]
+  ST addr16, r1     0x11    mem[D1] = r1
+  LDI16 R, imm16    N/A     R = D1        // ####
+  LD16 R, (addr16)  N/A     R = mem[D1]   // Pseudo Instrs.
+  ST16 (addr16), R  N/A     mem[D1] = R   // ####
+  MOV r1, r2        0x20    r3 = r1
+  ADD r3, r1, r2    0x30    r3 = r1 + r2
+  ADDC r3, r1, r2   0x31    r3 = r1 + r2 + carry 
+  SUB r3, r1, r2    0x32    r3 = r1 - r2
+  SUBB r3, r1, r2   0x33    r3 = r1 - r2 - borrow
+  AND r3, r1, r2    0x34    r3 = r1 & r2
+  OR  r3, r1, r2    0x35    r3 = r1 | r2
+  XOR r3, r1, r2    0x36    r3 = r1 ^ r2
+  ADDI r            0x40    r3 = r1 + imm8                
+  JMP addr16        0x50    PC = D1
+  JZ addr16         0x51    PC = D1 if Z flag is set
+  JNZ addr16        0x52    PC = D1 if Z flag is not set
+  JN addr16         0x53    PC = D1 if N flag is set
+  JNN addr16        0x54    PC = D1 if N flag is not set
+  CALL addr16       0x60    RA = PC, PC = D1
+  RET               0x70    PC = RA
+  PUSH r            0x80    mem[SP] = r, SP = SP - 1
+  POP r             0x81    SP = SP + 1, r = mem[SP]
+  NOP               0xFF    No operation
 
-    instructions are of the format:
-      XXXXXRRR, where XXXXX is the instruction, and RRR is the destination register
-    
-    these include:
-      opcode:   desc.:                args:           result:
-      00000RRR  immidiate add         R1, D1          RRR <- R1 + D
-      00001RRR  add                   R1, R2          RRR <- R1 + R2
-      00010RRR  and                   R1, R2          RRR <- R1 & R2
-      00011RRR  or                    R1, R2          RRR <- R1 | R2
-      00100RRR  set (16)              D1, D2          RRR <- [D1, D2]
-      00101RRR  add (16)              R1, R2          RRR <- R1 + R2
-      00110RRR  and (16)              R1, R2          RRR <- R1 & R2
-      00111RRR  or (16)               R1, R2          RRR <- R1 | R2
+
+machine instr. are all of form:
+
+opcode   r1     r2     r3 and dont care or imm16 [15:8]  imm8 or imm16 [7:0]
+CCCCCCCC AAA    BBB    CCCXXXXX                          IIIIIIII 
+8 bit    3 bit  3 bit  16 bit 
+
+
+alu operations
+  code:   operation:
+  000     x1 + x2 + carry_in
+  001     x1 - x2 - borrow_in
+  010     x1 & x2
+  011     x1 | x2
+  100     x1 ^ x2
