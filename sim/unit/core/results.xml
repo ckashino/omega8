@@ -1,12 +1,12 @@
 <testsuites name="results">
   <testsuite name="all" package="all">
-    <property name="random_seed" value="1753208056" />
-    <testcase name="test_ldi_add_basic" classname="verify" file="/home/ckashino/programming/verilog/8bit/sim/unit/core/verify.py" lineno="25" time="0.0016884803771972656" sim_time_ns="0.126" ratio_time="74.62331318836488" />
-    <testcase name="test_addc" classname="verify" file="/home/ckashino/programming/verilog/8bit/sim/unit/core/verify.py" lineno="74" time="0.0009264945983886719" sim_time_ns="0.15100000000000002" ratio_time="162.97990324240868" />
-    <testcase name="test_subb" classname="verify" file="/home/ckashino/programming/verilog/8bit/sim/unit/core/verify.py" lineno="96" time="0.0011026859283447266" sim_time_ns="0.21099999999999997" ratio_time="191.350950054054" />
-    <testcase name="test_flags" classname="verify" file="/home/ckashino/programming/verilog/8bit/sim/unit/core/verify.py" lineno="136" time="0.0008637905120849609" sim_time_ns="0.15100000000000002" ratio_time="174.8109036709909" />
-    <testcase name="test_pc_jumps" classname="verify" file="/home/ckashino/programming/verilog/8bit/sim/unit/core/verify.py" lineno="158" time="0.0008127689361572266" sim_time_ns="0.11099999999999999" ratio_time="136.57018011146963" />
-    <testcase name="test_mem_load" classname="verify" file="/home/ckashino/programming/verilog/8bit/sim/unit/core/verify.py" lineno="192" time="0.0004420280456542969" sim_time_ns="0.061000000000000054" ratio_time="138.00029341963335" />
-    <testcase name="test_mem_store" classname="verify" file="/home/ckashino/programming/verilog/8bit/sim/unit/core/verify.py" lineno="213" time="0.0006456375122070312" sim_time_ns="0.11099999999999999" ratio_time="171.92309601181682" />
+    <property name="random_seed" value="1753463361" />
+    <testcase name="test_ldi_add_basic" classname="verify" file="/home/ckashino/programming/verilog/8bit/sim/unit/core/verify.py" lineno="26" time="0.0026025772094726562" sim_time_ns="0.141" ratio_time="54.17706705753022" />
+    <testcase name="test_addc" classname="verify" file="/home/ckashino/programming/verilog/8bit/sim/unit/core/verify.py" lineno="59" time="0.0009140968322753906" sim_time_ns="0.151" ratio_time="165.19037663015126" />
+    <testcase name="test_subb" classname="verify" file="/home/ckashino/programming/verilog/8bit/sim/unit/core/verify.py" lineno="81" time="0.0012574195861816406" sim_time_ns="0.21100000000000002" ratio_time="167.8039711793705" />
+    <testcase name="test_flags" classname="verify" file="/home/ckashino/programming/verilog/8bit/sim/unit/core/verify.py" lineno="121" time="0.0008459091186523438" sim_time_ns="0.15100000000000002" ratio_time="178.50617361894027" />
+    <testcase name="test_pc_jumps" classname="verify" file="/home/ckashino/programming/verilog/8bit/sim/unit/core/verify.py" lineno="143" time="0.0009312629699707031" sim_time_ns="0.11099999999999999" ratio_time="119.1929708141321" />
+    <testcase name="test_mem_load" classname="verify" file="/home/ckashino/programming/verilog/8bit/sim/unit/core/verify.py" lineno="177" time="0.0004267692565917969" sim_time_ns="0.06099999999999994" ratio_time="142.9343821229049" />
+    <testcase name="test_mem_store" classname="verify" file="/home/ckashino/programming/verilog/8bit/sim/unit/core/verify.py" lineno="198" time="0.0006475448608398438" sim_time_ns="0.1110000000000001" ratio_time="171.41669513991178" />
   </testsuite>
 </testsuites>

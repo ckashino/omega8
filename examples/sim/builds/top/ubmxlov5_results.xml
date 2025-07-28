@@ -1,0 +1,6 @@
+<testsuites name="results">
+  <testsuite name="all" package="all">
+    <property name="random_seed" value="1753545615" />
+    <testcase name="test_program_run" classname="top_tests" file="/home/ckashino/programming/verilog/8bit/examples/sim/top_tests.py" lineno="5" time="0.006201505661010742" sim_time_ns="1.211" ratio_time="195.27515835608014" />
+  </testsuite>
+</testsuites>

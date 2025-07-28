@@ -2,7 +2,7 @@
 module reg_file (
   input [2:0] i_r_address1, i_r_address2, i_w_address,
   input [7:0] i_data,
-  input i_read, i_write,
+  input i_write,
   input i_clk, i_rst,
   output reg [7:0] o_data1, o_data2
   );
@@ -23,12 +23,11 @@ module reg_file (
         registers[i] = 0;
       end
     end
-    if (i_read) begin
-        o_data1 <= registers[i_r_address1];
-        o_data2 <= registers[i_r_address2];
-    end
     if (i_write) begin
       registers[i_w_address] <= i_data;
+    end else begin
+        o_data1 <= registers[i_r_address1];
+        o_data2 <= registers[i_r_address2];
     end
   end
 

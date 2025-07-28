@@ -5,12 +5,13 @@ module core #(
   input               i_rst,
 
   input       [29:0]  i_instr_data,
+  input               i_instr_read_done,
   output reg  [15:0]  o_instr_addr,
   output reg          o_instr_read,
 
   output reg  [15:0]  o_ram_addr,
   input       [7:0]   i_ram_data_in,
-  output reg  [7:0]   o_ram_data_out,
+  output      [7:0]   o_ram_data_out,
   output reg          o_ram_read,
   output reg          o_ram_write,
   input               i_ram_done,
@@ -23,6 +24,7 @@ module core #(
   reg [15:0] sp = RAM_ADDR_SIZE;
   reg [29:0] curr_instr;
   reg [1:0]  flags_reg; // {Negative, Zero}
+  reg [1:0]  next_flags_reg; // {Negative, Zero}
 
   localparam S_FETCH      = 3'b000;
   localparam S_DECODE     = 3'b001;
@@ -41,7 +43,7 @@ module core #(
   wire [7:0] imm8 = curr_instr[7:0];
   wire [15:0] imm16 = curr_instr[15:0];
 
-  reg reg_read_en, reg_write_en;
+  reg reg_write_en;
   wire [7:0] reg_file_out1, reg_file_out2;
   reg [7:0] reg_write_data;
 
@@ -50,7 +52,7 @@ module core #(
     .i_r_address1(r1_addr), .i_r_address2(r2_addr),
     .i_w_address(r3_addr),
     .i_data(reg_write_data),
-    .i_read(reg_read_en), .i_write(reg_write_en),
+    .i_write(reg_write_en),
     .o_data1(reg_file_out1), .o_data2(reg_file_out2)
   );
 
@@ -76,6 +78,8 @@ module core #(
     .o_result(alu_result)
   );
 
+  reg ram_imm_select = 1'b0;
+  assign o_ram_data_out = (ram_imm_select == 1'b0) ? reg_file_out1 : imm8;
 
   always @(posedge i_clk or posedge i_rst) begin
     if (i_rst) begin
@@ -86,9 +90,8 @@ module core #(
       sp         <= 16'hFFFF; 
     end else begin
       curr_state <= next_state;
-
+      flags_reg  <= next_flags_reg;
       if (next_state == S_DECODE && curr_state == S_FETCH) begin
-        curr_instr <= i_instr_data;
         pc <= pc + 1; 
       end
 
@@ -106,34 +109,20 @@ module core #(
           8'h70: pc <= ra; // RET
         endcase
       end
-
-      if (curr_state == S_MEM_WAIT && i_ram_done) begin
-          if(opcode == 8'h80) sp <= sp - 1; // PUSH
-          if(opcode == 8'h81) sp <= sp + 1; // POP
-      end
-
-      // Update flags register only on ALU operations
-      if (curr_state == S_EXECUTE) begin
-          flags_reg <= {alu_neg_out, alu_zero_out};
-      end
     end
   end
 
 
   always_comb begin
     next_state       = curr_state;
+    next_flags_reg = flags_reg;
     o_instr_read     = 1'b0;
 
-    // mem signals stay stable while waiting
-    if (curr_state != S_MEM_WAIT) begin
-      o_ram_read       = 1'b0;
-      o_ram_write      = 1'b0;
-      o_ram_addr       = 16'h0000;
-      o_ram_data_out   = 8'h00;
-    end
+    o_ram_read       = 1'b0;
+    o_ram_write      = 1'b0;
+    o_ram_addr       = 16'h0000;
 
     reg_write_en     = 1'b0;
-    reg_read_en      = 1'b0;
     reg_write_data   = 8'h00;
     o_cpu_done       = 1'b0;
 
@@ -141,14 +130,22 @@ module core #(
       S_FETCH: begin
         o_instr_read = 1'b1;
         o_instr_addr = pc;
-        next_state   = S_DECODE;
+        // Optionally, can take more than a clock to get instructions
+        // depending on their source.
+        if (i_instr_read_done == 1'b1) begin
+          curr_instr   = i_instr_data;
+          next_state   = S_DECODE;
+        end else
+          next_state   = S_FETCH;
       end
 
       S_DECODE: begin
-        reg_read_en = 1'b1; // Always read potential operands
         case (instr_class)
           4'h0: next_state = S_WB; // LDI
-          4'h1: next_state = S_MEM_ACCESS; // LD, ST
+          4'h1: begin
+            ram_imm_select = 1'b0;
+            next_state = S_MEM_ACCESS; // LD, ST
+          end
           4'h2: next_state = S_WB; // MOV
           4'h3: begin // ALU Ops
             alu_b_select = 1'b0;
@@ -157,7 +154,7 @@ module core #(
                      (opcode[3:0] == 4'h4) ? 3'b010 : // AND
                      (opcode[3:0] == 4'h5) ? 3'b011 : 3'b100; // OR, XOR
             next_state = S_EXECUTE;
-            alu_carry_select = (opcode[3:0] == 4'h1 || opcode[3:0] == 4'h3) ? 1'b1 : 1'b1;
+            alu_carry_select = (opcode[3:0] == 4'h1 || opcode[3:0] == 4'h3) ? 1'b1 : 1'b0;
           end
           4'h4: begin // ADDI
             alu_b_select = 1'b1;
@@ -168,7 +165,10 @@ module core #(
             next_state = S_FETCH;// Jumps, CALL, RET are handled in clocked block
             o_cpu_done = 1'b1;
           end
-          4'h8: next_state = S_MEM_ACCESS; // PUSH, POP
+          4'h8: begin
+            ram_imm_select = 1'b1;
+            next_state = S_MEM_ACCESS; // PUSH, POP
+          end
           default: next_state = S_FETCH; // NOP, invalid
         endcase
         if (opcode == 8'hFF) o_cpu_done = 1'b1; // NOP
@@ -186,16 +186,18 @@ module core #(
                 if(opcode == 8'h10) o_ram_read = 1'b1; //LD
                 else begin //ST
                     o_ram_write = 1'b1;
-                    o_ram_data_out = reg_file_out1;
                 end
             end
             4'h8: begin // PUSH, POP
-                o_ram_addr = sp;
                 if(opcode == 8'h80) begin // PUSH
-                    o_ram_write = 1'b1;
-                    o_ram_data_out = reg_file_out1;
+                  o_ram_addr = sp;
+                  o_ram_write = 1'b1;
+                  sp = sp - 1;
                 end else begin // POP
-                    o_ram_read = 1'b1;
+                  sp = sp + 1;
+                  o_ram_addr = sp;
+                  o_ram_read = 1'b1;
+                  
                 end
             end
         endcase
@@ -224,11 +226,11 @@ module core #(
           4'h0: reg_write_data = imm8; // LDI
           4'h1: reg_write_data = i_ram_data_in; // LD
           4'h2: reg_write_data = reg_file_out1; // MOV
-          4'h3: begin
+          4'h3, 4'h4: begin
+            next_flags_reg = {alu_neg_out, alu_zero_out};
             reg_write_data = alu_result; // ALU ops
             alu_carry_in = alu_carry_out;
           end
-          4'h4: reg_write_data = alu_result; // ADDI
           4'h8: reg_write_data = i_ram_data_in; // POP
         endcase
         reg_write_en = 1'b1;

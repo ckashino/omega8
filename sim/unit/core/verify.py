@@ -3,11 +3,12 @@ from cocotb.clock import Clock
 from cocotb.triggers import RisingEdge, FallingEdge, Timer
 
 def reset_inputs(dut):
+    dut.i_instr_read_done.value = 1
     dut.i_instr_data.value = 0
-    dut.i_ram_data_in = 0
-    dut.i_clk = 0
-    dut.i_rst = 0
-    dut.i_ram_done = 0
+    dut.i_ram_data_in.value= 0
+    dut.i_clk.value = 0
+    dut.i_rst.value = 0
+    dut.i_ram_done.value = 0
 
 async def run_instr(dut, instr):
     dut.i_instr_data.value = instr
@@ -30,20 +31,12 @@ async def test_ldi_add_basic(dut):
 
     reset_inputs(dut)
 
+    # small check for multicycle instruction read
+    dut.i_instr_read_done.value = 0
+    await RisingEdge(dut.i_clk)
     dut.i_instr_data.value = 0b00_00000000_000_000_000_00000_00000001
-
-
-    cycles_waited = 0
-
-    while dut.o_cpu_done != 1:
-        await RisingEdge(dut.i_clk)
-        cycles_waited += 1
-
-        if cycles_waited >= 100:
-            break
-
-    await FallingEdge(dut.i_clk)
-    dut.i_instr_data.value = 0b00_00110000_000_000_000_00000_00000001
+    await RisingEdge(dut.i_clk)
+    dut.i_instr_read_done.value = 1
 
     cycles_waited = 0
 
@@ -56,20 +49,12 @@ async def test_ldi_add_basic(dut):
 
     await FallingEdge(dut.i_clk)
 
-    dut.i_instr_data.value = 0b00_00110000_000_000_000_00000_00000001
+    await run_instr(dut, 0b00_00110000_000_000_000_00000_00000001)
+    await RisingEdge(dut.o_instr_read)
 
-    cycles_waited = 0
-
-    while dut.o_cpu_done != 1:
-        await RisingEdge(dut.i_clk)
-        cycles_waited += 1
-
-        if cycles_waited >= 100:
-            break
-
+    await run_instr(dut, 0b00_00110000_000_000_000_00000_00000001)
     assert dut.reg_write_data.value == 4
-
-    await FallingEdge(dut.i_clk)
+    await RisingEdge(dut.o_instr_read)
 
 @cocotb.test()
 async def test_addc(dut):
@@ -146,13 +131,13 @@ async def test_flags(dut):
     await run_instr(dut, 0b00_01000000_000_000_000_00000_00000000)
     await RisingEdge(dut.o_instr_read)
 
-    assert dut.flags_reg == 0b01
+    assert dut.flags_reg.value == 0b01
     
     await run_instr(dut, 0b00_00000000_000_000_000_00000_00000000)
     await RisingEdge(dut.o_instr_read)
 
     await run_instr(dut, 0b00_01000000_000_000_000_00000_11111111)
-    assert dut.flags_reg == 0b10
+    assert dut.flags_reg.value == 0b10
     await RisingEdge(dut.o_instr_read)
 
 @cocotb.test()

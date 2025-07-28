@@ -1,0 +1,10 @@
+0x0: ldi r0, 6        # counter
+0x1: ldi r1, 0        # f0
+0x2: ldi r2, 1        # f1
+0x3: ldi r3, 0        # f(n)
+0x4: add r3, r1, r2
+0x5: mov r1, r2
+0x6: mov r2, r3
+0x7: addi r0, r0, -1
+0x8: jnz 0x4
+0x9: push r3

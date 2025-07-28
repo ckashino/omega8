@@ -15,12 +15,12 @@ instruction overview:
 
   mnemonic:         opcode  results: 
   LDI r3, imm8      0x00    r3 = d1
-  LD r1, addr16     0x10    r3 = mem[D1]
+  LD r3, addr16     0x10    r3 = mem[D1]
   ST addr16, r1     0x11    mem[D1] = r1
   LDI16 R, imm16    N/A     R = D1        // ####
   LD16 R, (addr16)  N/A     R = mem[D1]   // Pseudo Instrs.
   ST16 (addr16), R  N/A     mem[D1] = R   // ####
-  MOV r1, r2        0x20    r3 = r1
+  MOV r3, r1        0x20    r3 = r1
   ADD r3, r1, r2    0x30    r3 = r1 + r2
   ADDC r3, r1, r2   0x31    r3 = r1 + r2 + carry 
   SUB r3, r1, r2    0x32    r3 = r1 - r2
@@ -28,7 +28,7 @@ instruction overview:
   AND r3, r1, r2    0x34    r3 = r1 & r2
   OR  r3, r1, r2    0x35    r3 = r1 | r2
   XOR r3, r1, r2    0x36    r3 = r1 ^ r2
-  ADDI r            0x40    r3 = r1 + imm8                
+  ADDI r3, r1, imm8 0x40    r3 = r1 + imm8                
   JMP addr16        0x50    PC = D1
   JZ addr16         0x51    PC = D1 if Z flag is set
   JNZ addr16        0x52    PC = D1 if Z flag is not set
@@ -36,8 +36,8 @@ instruction overview:
   JNN addr16        0x54    PC = D1 if N flag is not set
   CALL addr16       0x60    RA = PC, PC = D1
   RET               0x70    PC = RA
-  PUSH r            0x80    mem[SP] = r, SP = SP - 1
-  POP r             0x81    SP = SP + 1, r = mem[SP]
+  PUSH r1           0x80    mem[SP] = r, SP = SP - 1
+  POP r1            0x81    SP = SP + 1, r = mem[SP]
   NOP               0xFF    No operation
 
 

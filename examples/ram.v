@@ -16,13 +16,14 @@ module ram #(
 
   always @(posedge i_clk) begin
     o_done <= 0;
+    o_data <= o_data;
 
     if (i_write) begin
       mem[i_address] <= i_data;
       o_done <= 1;
     end
     if (i_read) begin
-      o_data <= i_data;
+      o_data <= mem[i_address];
       o_done <= 1;
     end
   end
