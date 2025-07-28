@@ -137,8 +137,9 @@ async def test_flags(dut):
     await RisingEdge(dut.o_instr_read)
 
     await run_instr(dut, 0b00_01000000_000_000_000_00000_11111111)
-    assert dut.flags_reg.value == 0b10
     await RisingEdge(dut.o_instr_read)
+    assert dut.flags_reg.value == 0b10
+
 
 @cocotb.test()
 async def test_pc_jumps(dut):

@@ -17,18 +17,19 @@ module reg_file (
   end
 
   always @(posedge i_clk or posedge i_rst) begin
-    if (i_rst) begin
-      i = 0;
-      for (i=0;i<8;i=i+1) begin
-        registers[i] = 0;
+    if (i_rst) begin 
+      for (i=0; i<8; i=i+1) begin
+        registers[i] <= 8'b0;
       end
-    end
-    if (i_write) begin
-      registers[i_w_address] <= i_data;
-    end else begin
-        o_data1 <= registers[i_r_address1];
-        o_data2 <= registers[i_r_address2];
+      o_data1 <= 8'b0;
+      o_data2 <= 8'b0;
+    end 
+    else begin
+      if (i_write) begin
+        registers[i_w_address] <= i_data;
+      end
+      o_data1 <= registers[i_r_address1];
+      o_data2 <= registers[i_r_address2];
     end
   end
-
 endmodule

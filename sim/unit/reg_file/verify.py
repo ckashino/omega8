@@ -9,7 +9,6 @@ async def test_read(dut):
     dut.i_r_address2.value = 1
 
     dut.i_clk.value = 0
-    dut.i_read.value = 1
     dut.i_write.value = 0
 
     dut.registers.value = [0x01, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]
@@ -30,7 +29,6 @@ async def test_read(dut):
 async def test_write(dut):
 
     dut.i_clk.value = 0
-    dut.i_read.value = 0
     dut.i_write.value = 1
     dut.i_w_address.value = 0
     dut.i_data.value = 8

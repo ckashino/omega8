@@ -78,8 +78,7 @@ module core #(
     .o_result(alu_result)
   );
 
-  reg ram_imm_select = 1'b0;
-  assign o_ram_data_out = (ram_imm_select == 1'b0) ? reg_file_out1 : imm8;
+  assign o_ram_data_out = reg_file_out1;
 
   always @(posedge i_clk or posedge i_rst) begin
     if (i_rst) begin
@@ -107,6 +106,11 @@ module core #(
             pc <= imm16;
           end
           8'h70: pc <= ra; // RET
+        endcase
+      end else if (curr_state == S_MEM_WAIT) begin
+        case (opcode)
+          8'h80: sp <= sp - 1;
+          8'h81: sp <= sp + 1;
         endcase
       end
     end
@@ -143,7 +147,6 @@ module core #(
         case (instr_class)
           4'h0: next_state = S_WB; // LDI
           4'h1: begin
-            ram_imm_select = 1'b0;
             next_state = S_MEM_ACCESS; // LD, ST
           end
           4'h2: next_state = S_WB; // MOV
@@ -166,7 +169,6 @@ module core #(
             o_cpu_done = 1'b1;
           end
           4'h8: begin
-            ram_imm_select = 1'b1;
             next_state = S_MEM_ACCESS; // PUSH, POP
           end
           default: next_state = S_FETCH; // NOP, invalid
@@ -192,10 +194,8 @@ module core #(
                 if(opcode == 8'h80) begin // PUSH
                   o_ram_addr = sp;
                   o_ram_write = 1'b1;
-                  sp = sp - 1;
                 end else begin // POP
-                  sp = sp + 1;
-                  o_ram_addr = sp;
+                  o_ram_addr = sp + 1;
                   o_ram_read = 1'b1;
                   
                 end

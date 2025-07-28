@@ -14,3 +14,4 @@ async def test_program_run(dut):
         if dut.instr_addr.value == 0xC:
             break
 
+    assert dut.ram_data_read.value == 0x0D
