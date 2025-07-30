@@ -9,9 +9,9 @@ async def test_program_run(dut):
     await Timer(20, units="ps")
     dut.i_rst.value = 0
 
-    while True:
-        await RisingEdge(dut.i_clk)
-        if dut.instr_addr.value == 0xC:
-            break
+    await FallingEdge(dut.ram_read)
+    await RisingEdge(dut.i_clk) 
 
     assert dut.ram_data_read.value == 0x0D
+
+    await ClockCycles(dut.i_clk, 20)

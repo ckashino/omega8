@@ -70,9 +70,9 @@ async def test_addc(dut):
     await RisingEdge(dut.o_instr_read)
 
     await run_instr(dut, 0b00_00110000_000_001_010_00000_00000000)
-    assert dut.alu_carry_in.value == 0b1
     assert dut.reg_write_data.value == 0
     await RisingEdge(dut.o_instr_read)
+    assert dut.flags_reg.value[2] == 0b1
 
     await run_instr(dut, 0b00_00110001_001_001_011_00000_00000000)
     assert dut.reg_write_data.value == (2 + 2 + 1) # reg1 (2) + reg1 (2) + carry (1)

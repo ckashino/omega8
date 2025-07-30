@@ -21,10 +21,10 @@ module core #(
 
   reg [15:0] pc;
   reg [15:0] ra;
-  reg [15:0] sp = RAM_ADDR_SIZE;
+  reg [15:0] sp;
   reg [29:0] curr_instr;
-  reg [1:0]  flags_reg; // {Negative, Zero}
-  reg [1:0]  next_flags_reg; // {Negative, Zero}
+  reg [2:0]  flags_reg; // {Carry, Negative, Zero}
+  reg [2:0]  next_flags_reg; // {Carry, Negative, Zero}
 
   localparam S_FETCH      = 3'b000;
   localparam S_DECODE     = 3'b001;
@@ -57,20 +57,23 @@ module core #(
   );
 
   wire [7:0] alu_result;
-  reg [2:0] alu_op;
+  wire [2:0] alu_op = (instr_class != 4'h3) ? 3'b000 : (
+    (opcode[3:0] == 4'h0 || opcode[3:0] == 4'h1) ? 3'b000 : // ADD, ADDC
+      (opcode[3:0] == 4'h2 || opcode[3:0] == 4'h3) ? 3'b001 : // SUB, SUBB
+      (opcode[3:0] == 4'h4) ? 3'b010 : // AND
+      (opcode[3:0] == 4'h5) ? 3'b011 : 3'b100
+    ); // OR, XOR
+
   wire [7:0] alu_a_operand = reg_file_out1;
-  reg alu_b_select = 1'b0;
-  wire [7:0] alu_b_operand = (alu_b_select == 1'b0) ? reg_file_out2 : imm8;
+  wire [7:0] alu_b_operand = (instr_class == 4'h4) ? imm8 : reg_file_out2;
 
   wire alu_carry_out;
-  reg alu_carry_select = 1'b1;
-  reg alu_carry_in = 1'b0;
-  wire alu_carry_in_comb = (alu_carry_select == 1'b0) ? 1'b0 : alu_carry_in;
+  wire alu_carry_in = (opcode == 8'h31 || opcode == 8'h33) ? flags_reg[2] : 1'b0;
   wire alu_overflow_out, alu_neg_out, alu_zero_out;
 
   alu u_alu(
     .i_clk(i_clk),
-    .i_carry_borrow(alu_carry_in_comb),
+    .i_carry_borrow(alu_carry_in),
     .i_a(alu_a_operand), .i_b(alu_b_operand),
     .i_op(alu_op),
     .o_carry_borrow(alu_carry_out), .o_overflow(alu_overflow_out),
@@ -83,14 +86,16 @@ module core #(
   always @(posedge i_clk or posedge i_rst) begin
     if (i_rst) begin
       curr_state <= S_FETCH;
-      flags_reg  <= 2'b0;
+      flags_reg  <= 3'b0;
       pc         <= 16'h0000;
       ra         <= 16'h0000;
-      sp         <= 16'hFFFF; 
+      sp         <= RAM_ADDR_SIZE; 
+      curr_instr <= 30'h0;
     end else begin
       curr_state <= next_state;
       flags_reg  <= next_flags_reg;
       if (next_state == S_DECODE && curr_state == S_FETCH) begin
+        curr_instr <= i_instr_data;
         pc <= pc + 1; 
       end
 
@@ -107,10 +112,13 @@ module core #(
           end
           8'h70: pc <= ra; // RET
         endcase
-      end else if (curr_state == S_MEM_WAIT) begin
+      end else if (curr_state == S_DECODE && next_state == S_MEM_ACCESS) begin
+        case (opcode)
+          8'h81: sp <= sp + 1;
+        endcase
+      end else if (curr_instr == S_MEM_ACCESS && next_state == S_MEM_WAIT) begin
         case (opcode)
           8'h80: sp <= sp - 1;
-          8'h81: sp <= sp + 1;
         endcase
       end
     end
@@ -119,7 +127,7 @@ module core #(
 
   always_comb begin
     next_state       = curr_state;
-    next_flags_reg = flags_reg;
+    next_flags_reg   = flags_reg;
     o_instr_read     = 1'b0;
 
     o_ram_read       = 1'b0;
@@ -129,15 +137,16 @@ module core #(
     reg_write_en     = 1'b0;
     reg_write_data   = 8'h00;
     o_cpu_done       = 1'b0;
+    
+    o_instr_addr = pc;
+
 
     case (curr_state)
       S_FETCH: begin
         o_instr_read = 1'b1;
-        o_instr_addr = pc;
         // Optionally, can take more than a clock to get instructions
         // depending on their source.
         if (i_instr_read_done == 1'b1) begin
-          curr_instr   = i_instr_data;
           next_state   = S_DECODE;
         end else
           next_state   = S_FETCH;
@@ -151,17 +160,9 @@ module core #(
           end
           4'h2: next_state = S_WB; // MOV
           4'h3: begin // ALU Ops
-            alu_b_select = 1'b0;
-            alu_op = (opcode[3:0] == 4'h0 || opcode[3:0] == 4'h1) ? 3'b000 : // ADD, ADDC
-                     (opcode[3:0] == 4'h2 || opcode[3:0] == 4'h3) ? 3'b001 : // SUB, SUBB
-                     (opcode[3:0] == 4'h4) ? 3'b010 : // AND
-                     (opcode[3:0] == 4'h5) ? 3'b011 : 3'b100; // OR, XOR
             next_state = S_EXECUTE;
-            alu_carry_select = (opcode[3:0] == 4'h1 || opcode[3:0] == 4'h3) ? 1'b1 : 1'b0;
           end
           4'h4: begin // ADDI
-            alu_b_select = 1'b1;
-            alu_op = 3'b000;
             next_state = S_EXECUTE;
           end
           4'h5, 4'h6, 4'h7: begin
@@ -195,7 +196,7 @@ module core #(
                   o_ram_addr = sp;
                   o_ram_write = 1'b1;
                 end else begin // POP
-                  o_ram_addr = sp + 1;
+                  o_ram_addr = sp;
                   o_ram_read = 1'b1;
                   
                 end
@@ -227,9 +228,8 @@ module core #(
           4'h1: reg_write_data = i_ram_data_in; // LD
           4'h2: reg_write_data = reg_file_out1; // MOV
           4'h3, 4'h4: begin
-            next_flags_reg = {alu_neg_out, alu_zero_out};
+            next_flags_reg = {alu_carry_out, alu_neg_out, alu_zero_out};
             reg_write_data = alu_result; // ALU ops
-            alu_carry_in = alu_carry_out;
           end
           4'h8: reg_write_data = i_ram_data_in; // POP
         endcase

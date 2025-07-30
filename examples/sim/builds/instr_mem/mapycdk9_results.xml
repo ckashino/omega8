@@ -1,0 +1,6 @@
+<testsuites name="results">
+  <testsuite name="all" package="all">
+    <property name="random_seed" value="1753807530" />
+    <testcase name="test_read" classname="instr_mem_tests" file="/home/ckashino/programming/verilog/8bit/examples/sim/instr_mem_tests.py" lineno="4" time="0.0006508827209472656" sim_time_ns="0.006" ratio_time="9.21825054945055" />
+  </testsuite>
+</testsuites>
