@@ -8,3 +8,6 @@ sim_build/
 
 .pytest_cache/
 */.pytest_cache/
+
+*/builds/
+builds/

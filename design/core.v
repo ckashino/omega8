@@ -61,8 +61,8 @@ module core #(
     (opcode[3:0] == 4'h0 || opcode[3:0] == 4'h1) ? 3'b000 : // ADD, ADDC
       (opcode[3:0] == 4'h2 || opcode[3:0] == 4'h3) ? 3'b001 : // SUB, SUBB
       (opcode[3:0] == 4'h4) ? 3'b010 : // AND
-      (opcode[3:0] == 4'h5) ? 3'b011 : 3'b100
-    ); // OR, XOR
+      (opcode[3:0] == 4'h5) ? 3'b011 : 3'b100 // OR, XOR
+    );
 
   wire [7:0] alu_a_operand = reg_file_out1;
   wire [7:0] alu_b_operand = (instr_class == 4'h4) ? imm8 : reg_file_out2;
@@ -155,24 +155,17 @@ module core #(
       S_DECODE: begin
         case (instr_class)
           4'h0: next_state = S_WB; // LDI
-          4'h1: begin
-            next_state = S_MEM_ACCESS; // LD, ST
-          end
+          4'h1: next_state = S_MEM_ACCESS; // LD, ST
           4'h2: next_state = S_WB; // MOV
-          4'h3: begin // ALU Ops
-            next_state = S_EXECUTE;
-          end
-          4'h4: begin // ADDI
-            next_state = S_EXECUTE;
-          end
+          4'h3: next_state = S_EXECUTE; // ALU Ops
+          4'h4: next_state = S_EXECUTE; // ADDI
           4'h5, 4'h6, 4'h7: begin
             next_state = S_FETCH;// Jumps, CALL, RET are handled in clocked block
             o_cpu_done = 1'b1;
           end
-          4'h8: begin
-            next_state = S_MEM_ACCESS; // PUSH, POP
-          end
+          4'h8: next_state = S_MEM_ACCESS; // PUSH, POP
           default: next_state = S_FETCH; // NOP, invalid
+
         endcase
         if (opcode == 8'hFF) o_cpu_done = 1'b1; // NOP
       end
@@ -191,6 +184,7 @@ module core #(
                     o_ram_write = 1'b1;
                 end
             end
+
             4'h8: begin // PUSH, POP
                 if(opcode == 8'h80) begin // PUSH
                   o_ram_addr = sp;
@@ -201,6 +195,7 @@ module core #(
                   
                 end
             end
+
         endcase
         next_state = S_MEM_WAIT;
       end
@@ -227,9 +222,9 @@ module core #(
           4'h0: reg_write_data = imm8; // LDI
           4'h1: reg_write_data = i_ram_data_in; // LD
           4'h2: reg_write_data = reg_file_out1; // MOV
-          4'h3, 4'h4: begin
+          4'h3, 4'h4: begin // ALU ops
             next_flags_reg = {alu_carry_out, alu_neg_out, alu_zero_out};
-            reg_write_data = alu_result; // ALU ops
+            reg_write_data = alu_result;
           end
           4'h8: reg_write_data = i_ram_data_in; // POP
         endcase

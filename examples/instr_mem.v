@@ -10,7 +10,6 @@ module instr_mem (
   // simple program to compute fibonacci(7)
   // then push it to the stack
   always_comb begin
-    if (i_instr_read) begin
       case (i_instr_addr)
         16'd0: instr = 30'b000000000000000000000000000110;
         16'd1: instr = 30'b000000000000000010000000000000;
@@ -26,13 +25,11 @@ module instr_mem (
         16'd11: instr = 30'b100000011000000000000000000000;
         default: instr = 30'h3FFFFFFF;
       endcase
-    end else begin
-      instr = instr;
-    end
   end
 
 
   assign o_instr_read_done = 1;
   assign o_instr = instr;
 endmodule
+
 
