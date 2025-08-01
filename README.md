@@ -48,6 +48,7 @@ back to the start of the iteration calculation steps, otherwises moves on. Once 
 at the current stack address, the CPU arbitrarily waits a cycle, then the result is popped from the stack into r4 for testing purposes.
 
 # TODO
+- (Optional?) multiply instrcutions.
 - Improve assembler to include support for planned pseudo instructions which will utilize existing instructions (e.g. IF, ADD16).
 - More consistent testing patterns.
 - Potentially move PUSH/POP instructions to be pseudo instructions, allowing the assembler to keep track of the stack pointer. This will also remove the stack pointer from the entire ISA.
