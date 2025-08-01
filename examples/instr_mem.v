@@ -31,5 +31,3 @@ module instr_mem (
   assign o_instr_read_done = 1;
   assign o_instr = instr;
 endmodule
-
-
