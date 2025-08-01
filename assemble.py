@@ -105,11 +105,9 @@ def extract_reg(reg: str) -> int:
 def get_assm(machine_code: str) -> str:
     standardized = machine_code.strip()
     pc = re.search(r"0[xX][a-f0-9A-F]:\s?", standardized)
-    if pc is None:
-        print("Start all lines with instruction number")
-        exit(2)
-
-    standardized = standardized[pc.span()[1]:]
+    if pc is not None:
+        standardized = standardized[pc.span()[1]:]
+    
     comments = re.search(r"(#.*)", standardized)
     if comments is not None:
         standardized = standardized[:comments.span()[0]].strip()
