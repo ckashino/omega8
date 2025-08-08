@@ -41,9 +41,9 @@ The supplied example calculates the 7th Fibonacci number.
 0xA: nop
 0xB: pop r4
 ```
-It starts off by initializing the relevant registers, zeroing r1 and r3, setting r2 to 1 (f(1)) and setting r0 to 6 ('loop' variable).
-Then performs the standard sequence of f(n) = f(n - 1) + f(n - 2), equivalent to r3 = r2 + r1. After, it moves f(n) into r2 (the new
-f(n-1)) and moves r2 into r1 (the new f(n-2)). The loop variable is then decremented, if there is still iterations remaining it jumps
+It starts off by initializing the relevant registers: zeroing r1 and r3, setting r2 to 1 (i.e. fib(1)) and setting r0 to 6 (the 'loop' variable).
+Then performs the standard sequence of f(n) = f(n - 1) + f(n - 2), equivalent to r3 = r2 + r1. After, it moves fib(n) into r2 (the new
+fib(n-1)) and moves r2 into r1 (the new fib(n-2)). The loop variable is then decremented, if there is still iterations remaining it jumps
 back to the start of the iteration calculation steps, otherwises moves on. Once the 'loop' is done, the final f(n) is pushed to the memory
 at the current stack address, the CPU arbitrarily waits a cycle, then the result is popped from the stack into r4 for testing purposes.
 
